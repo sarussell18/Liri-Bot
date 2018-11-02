@@ -1,13 +1,27 @@
-The challenge in this exercise was to create a command line interface version of Siri that would use twitter, spotify and OMDB. 
-liri.js can take in one of the following commands:
+# LiriBot
+Liri Bot Project
 
-    * `my-tweets`
+Meet Liri - Your Node.JS Personal Assistant:
 
-    * `spotify-this-song`
+- Concerts
+- Songs
+- Movies
 
-    * `movie-this`
+Use any of the follow line commands in the terminal to see the magic!
 
-    * `do-what-it-says`
-    
-    This was a challenging assignment, but older activities, familiarity with API calls and of course google and stack overflow were very helpful 
-    in completing this project. 
+- node liri.js conert-this </band name here/>
+- node liri.js spotify-this-song "</song title here/>"
+- node liri.js movie-this "</movie title here/>"
+- node liri.js do-what-it-says
+
+Liri Uses the Following Technologies:
+
+- Bands In Town for Concerts
+- Spotify for Songs
+- OMDB for Movies
+
+
+
+
+
+

@@ -1,23 +1,27 @@
 {
-  "name": "Liribot",
+  "name": "LiriBot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Liri Bot Project",
+  "main": "keys.js",
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "moment": "^2.22.2",
+    "node-spotify-api": "^1.0.7",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JordanH1982/Liribot.git"
+    "url": "git+https://github.com/ShutUpJon/LiriBot.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JordanH1982/Liribot/issues"
+    "url": "https://github.com/ShutUpJon/LiriBot/issues"
   },
-  "homepage": "https://github.com/JordanH1982/Liribot#readme",
-  "dependencies": {
-    "request": "^2.88.0"
-  }
+  "homepage": "https://github.com/ShutUpJon/LiriBot#readme"
 }
