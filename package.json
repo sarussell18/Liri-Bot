@@ -1,17 +1,23 @@
 {
-  "name": "LIRI-Bot",
+  "name": "Liribot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JordanH1982/Liribot.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JordanH1982/Liribot/issues"
+  },
+  "homepage": "https://github.com/JordanH1982/Liribot#readme",
   "dependencies": {
-    "bandsintown-events": "^1.0.4",
-    "chalk": "^2.4.1",
-    "moment": "^2.22.2"
+    "request": "^2.88.0"
   }
 }

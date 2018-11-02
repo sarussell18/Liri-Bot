@@ -1,152 +1,142 @@
 require("dotenv").config();
-var keys = require("./keys.js");
-// Terminal Colors
-const chalk = require('chalk');
-// Calls to BandsInTown and OMDB
-var request = require('request');
-// Date Formatting
-var moment = require('moment');
-// Spotify
-var Spotify = require('node-spotify-api');
-var spotify = new Spotify(keys.spotify);
 
-var fs = require('fs');
+var fs = require("fs");
+var Twitter = require("twitter");
+var Spotify = require("node-spotify-api");
+var request = require("request")
+var keys = require("./keys");
 
-let command = process.argv[2];
-let media_array = process.argv.slice(3);
-let media = media_array.join(" ");
+var action = process.argv[2];
+var parameter = process.argv[3];
+// labels to keep track of variables
 
-function doThings(command, media) {
-    switch (command) {
+function switchCase() {
+  // Switch cases for ease of use
+  switch (action) {
 
-        case 'spotify-this-song':
-            spotifyThis(media); break;
-        case 'movie-this':
-            movieThis(media); break;
-        case 'concert-this':
-            concertThis(media); break;
-        case 'do-what-it-says':
-            doWhatItSays(); break;
-        default:
-            console.log("Invalid command. Please type any of the following commands:");
-            console.log(chalk.magenta("concert-this,"), chalk.cyan("spotify-this-song,"), chalk.magenta("movie-this,"), chalk.cyan("do-what-it-says"));
+    case 'my-tweets':
+      grabTweets();                   
+      break;                          
+
+    case 'spotify-this-song':
+      grabSong();
+      break;
+
+    case 'movie-this':
+      grabMovie();
+      break;
+
+    case 'do-what-it-says':
+      grabReadme();
+      break;
+
+      default:                            // good idea from google in case a break is missed 
+      console.log("Something Broke");
+      break;
+
+  }
+};
+
+function grabTweets() {
+  console.log("Latest Tweets!");
+  // loading keys from the other js file... was using personal twitter at first. Oops.
+  var client = new Twitter({
+    consumer_key: keys.twitterKeys.consumer_key,
+    consumer_secret: keys.twitterKeys.consumer_secret,
+    access_token_key: keys.twitterKeys.access_token_key,
+    access_token_secret: keys.twitterKeys.access_token_secret
+  });
+
+  var params = {
+    screen_name: "Jordann50056855"
+  };
+  // Twittering the tweets
+  client.get("statuses/user_timeline", params, function(error, tweets, response) {
+    // Calling the get method and returning the Data
+    if (!error) {
+      for (var i = 0; i < tweets.length; i++) {
+        var returnedData = ('Number: ' + (i + 1) + '\n' + tweets[i].created_at + '\n' + tweets[i].text + '\n');
+        console.log(returnedData);
+      }
     }
-}
+  });
+};
 
-function spotifyThis(media) {
-    // Default value
-    if (media == "") {
-        media = "All Star"
+function grabMovie() {
+  console.log("My Favorite movie is Ghostbuters (the one from the 80's!)");
+
+  var findMovie;
+  // making sure a movie was entered, if not calling mr. nobody per instructions
+  if (parameter === undefined) {
+    findMovie = "Mr. Nobody";
+  } else {
+    findMovie = parameter;
+  };
+
+  var queryUrl = "http://www.omdbapi.com/?t=" + findMovie + "&y=&plot=short&apikey=trilogy";
+
+  console.log(queryUrl);
+  // thanks old OMDB exercises
+  request(queryUrl, function(err, res, body) {
+
+    if (!err && res.statusCode === 200) {
+
+      console.log("Title: " + JSON.parse(body).Title);
+      console.log("Release Year: " + JSON.parse(body).Year);
+      console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+      console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value); 
+      console.log("Country: " + JSON.parse(body).Country);
+      console.log("Language: " + JSON.parse(body).Language);
+      console.log("Plot: " + JSON.parse(body).Plot);
+      console.log("Actors: " + JSON.parse(body).Actors);
     }
+  });
+};
 
-    // Search spotify API
-    spotify
-        .search({ type: 'track', query: media, limit: 1 })
-        .then(function (response) {
-            var song = response.tracks.items[0];
-            if (song != undefined) {
-                console.log();
-                console.log(chalk.green("***********Song Name**********"));
-                console.log(song.name);
-
-                console.log(chalk.green("******Artist or Artists:******"));
-                for (i = 0; i < song.artists.length; i++) {
-                    console.log(song.artists[i].name);
-                }
-
-                console.log(chalk.green("*********Preview Link*********"));
-                console.log(song.preview_url);
-
-                console.log(chalk.green("************Album*************"));
-                console.log(song.album.name);
-                console.log();
-            } else {
-                console.log("Can't find this song!")
-            }
-        })
-        .catch(function (err) {
-            console.log(err);
-        });
-}
-
-function concertThis(media) {
-    // Default value
-    if (media == "") {
-        media = "Brockhampton"
+function grabSong() {
+  console.log("Tunes!");
+  // looking for key in the other js file
+  var spotify = new Spotify({
+    id: keys.spotifyKeys.client_ID,
+    secret: keys.spotifyKeys.client_secret
+  });
+  // if there was no song to search, pull up on of my faovrites
+  var searchTrack;
+  if (parameter === undefined) {
+    searchTrack = "Digital Bath";
+  } else {
+    searchTrack = parameter;
+  }
+  // code copied from "npmjs node-spotify-api" site
+  spotify.search({
+    type: 'track',
+    query: searchTrack
+  }, function(error, data) {
+    if (error) {
+      console.log('Error occurred: ' + error);
+      return;
+    } else {
+      console.log("Artist: " + data.tracks.items[0].artists[0].name);
+      console.log("Song: " + data.tracks.items[0].name);
+      console.log("Album: " + data.tracks.items[0].album.name);
+      console.log("Preview: " + data.tracks.items[3].preview_url); 
     }
-    request("https://rest.bandsintown.com/artists/" + media + "/events?app_id=codingbootcamp", function (error, response, data) {
-        try {
-            var response = JSON.parse(data)
-            if (response.length != 0) {
-                console.log(chalk.green(`Upcoming concerts for ${media} include: `))
-                response.forEach(function (element) {
-                    console.log(chalk.cyan("Venue name: " + element.venue.name));
-                    if (element.venue.country == "United States") {
-                        console.log("City: " + element.venue.city + ", " + element.venue.region);
-                    } else {
-                        console.log("City: " + element.venue.city + ", " + element.venue.country);
-                    }
-                    console.log("Date: " + moment(element.datetime).format('MM/DD/YYYY'));
-                    console.log();
-                })
-            } else {
-                console.log(chalk.red("No concerts found."));
-            }
-        }
-        catch (error) {
-            console.log(chalk.red("No concerts found."));
-        }
-    });
-}
+  });
+};
 
-function movieThis(media) {
-    // Default value
-    if (media == "") {
-        media = "Mr. Nobody"
+function grabReadme() {
+  // readFile exercise came in handy here
+  fs.readFile("random.txt", "utf8", function(err, data) {
+    if (err) {
+      return console.log(err);
     }
-    request("http://www.omdbapi.com/?apikey=trilogy&t=" + media, function (error, response, data) {
-        try {
-            var response = JSON.parse(data)
-            if (response.Title != undefined) {
-                console.log(chalk.green("*************Movie Name**************"));
-                console.log(response.Title);
-                console.log(chalk.green("*****************Year****************"));
-                console.log(response.Year);
-                console.log(chalk.green("***" + response.Ratings[0].Source + " Rating****"));
-                console.log(response.Ratings[0].Value);
-                // This is in case there's only ratings from one source
-                // at time of publication, ex: "Bad Times at the El Royale"
-                try {
-                    console.log(chalk.green("********" + response.Ratings[1].Source + " Rating*******"));
-                    console.log(response.Ratings[1].Value);
-                } catch { }
-                console.log(chalk.green("****************Country**************"));
-                console.log(response.Country);
-                console.log(chalk.green("***************Language**************"));
-                console.log(response.Language);
-                console.log(chalk.green("*****************Plot****************"));
-                console.log(response.Plot);
-                console.log(chalk.green("****************Actors***************"));
-                console.log(response.Actors);
-                console.log();
-            } else {
-                console.log(chalk.red("This movie not found."));
-            }
-        }
-        catch (error) {
-            console.log(chalk.red("This movie not found."));
-        }
-    });
+    // Break it down and store it
+    var output = data.split().splice(",");
+    
+    for (var i = 0; i < output.length; i++) {
+      // print it all
+      console.log(output[i]);
+    }
+  });
 }
-
-function doWhatItSays() {
-    fs.readFile("random.txt", "utf8", function (err, response) {
-        if (err) {
-            console.log(err);
-        }
-        let params = (response.split(','));
-        doThings(params[0], params[1]);
-    })
-}
-
-doThings(command, media);
+switchCase();
